@@ -43,7 +43,15 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['1'], 'Science')
         self.assertEqual(data['6'], 'Sports')
 
+    def test_get_questions(self):
+        res = self.client().get('/questions')
+        data = json.loads(res.data)
 
-# Make the tests conveniently executable
+        self.assertEqual(res.status_code, 200)
+        self.assertIsNotNone(data['questions'])
+        self.assertIsNotNone(data['total_questions'])
+        self.assertIsNotNone(data['categories'])
+
+        # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
