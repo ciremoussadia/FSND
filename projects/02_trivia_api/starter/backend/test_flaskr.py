@@ -52,6 +52,21 @@ class TriviaTestCase(unittest.TestCase):
         self.assertIsNotNone(data['total_questions'])
         self.assertIsNotNone(data['categories'])
 
-        # Make the tests conveniently executable
+    def test_delete_question(self):
+        question = Question("What's my name?", "FooBar", '2', 4)
+        question.insert()
+
+        res = self.client().delete('/questions/{}'.format(question.id))
+
+        self.assertEqual(res.status_code, 200)
+        self.assertIsNone(Question.query.get(question.id))
+
+    def test_delete_unexisting_question(self):
+        id = 404
+        res = self.client().delete('/questions/{}'.format(id))
+
+        self.assertEqual(res.status_code, 404)
+
+    # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()

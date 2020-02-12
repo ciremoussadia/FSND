@@ -65,10 +65,29 @@ def create_app(test_config=None):
 
         return jsonify({
             'questions': [question.format() for question in questions],
-            'total_questions': len(questions),
+            'total_questions': len(Question.query.all()),
             'categories': formatted_categories(categories)
         }
         ), 200
+
+    @app.route('/questions/<int:question_id>', methods=['DELETE'])
+    def delete_question(question_id):
+        question = Question.query.get(question_id)
+
+        if question is None:
+            abort(404)
+        else:
+            question.delete()
+            return jsonify({'success': True}), 200
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            'success': False,
+            'error': 404,
+            'message': 'NOt Found'
+        }), 404
+
     '''
   @TODO: 
   Create an endpoint to DELETE question using a question ID. 
