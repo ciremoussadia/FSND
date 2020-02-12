@@ -33,8 +33,8 @@ def create_app(test_config=None):
             'Access-Control-Allow-Methods', 'GET,POST,DELETE')
         return response
     '''
-  @TODO: 
-  Create an endpoint to handle GET requests 
+  @TODO:
+  Create an endpoint to handle GET requests
   for all available categories.
   '''
     @app.route('/categories')
@@ -42,20 +42,20 @@ def create_app(test_config=None):
         categories = Category.query.all()
         return jsonify(formatted_categories(categories)), 200
     '''
-  @TODO: 
-  Create an endpoint to handle GET requests for questions, 
-  including pagination (every 10 questions). 
-  This endpoint should return a list of questions, 
-  number of total questions, current category, categories. 
+  @TODO:
+  Create an endpoint to handle GET requests for questions,
+  including pagination (every 10 questions).
+  This endpoint should return a list of questions,
+  number of total questions, current category, categories.
 
 
   TEST: At this point, when you start the application
   you should see questions and categories generated,
   ten questions per page and pagination at the bottom of the screen for three pages.
-  Clicking on the page numbers should update the questions. 
+  Clicking on the page numbers should update the questions.
   '''
 
-    @app.route('/questions')
+    @app.route('/questions', methods=['GET'])
     def list_questions():
         page = request.args.get('page', 1, int)
         offset = (page - 1) * 10
@@ -80,32 +80,34 @@ def create_app(test_config=None):
             question.delete()
             return jsonify({'success': True}), 200
 
-    @app.errorhandler(404)
-    def not_found(error):
-        return jsonify({
-            'success': False,
-            'error': 404,
-            'message': 'NOt Found'
-        }), 404
-
     '''
-  @TODO: 
-  Create an endpoint to DELETE question using a question ID. 
+  @TODO:
+  Create an endpoint to DELETE question using a question ID.
 
   TEST: When you click the trash icon next to a question, the question will be removed.
-  This removal will persist in the database and when you refresh the page. 
+  This removal will persist in the database and when you refresh the page.
   '''
 
     '''
-  @TODO: 
-  Create an endpoint to POST a new question, 
-  which will require the question and answer text, 
+  @TODO:
+  Create an endpoint to POST a new question,
+  which will require the question and answer text,
   category, and difficulty score.
 
-  TEST: When you submit a question on the "Add" tab, 
+  TEST: When you submit a question on the "Add" tab,
   the form will clear and the question will appear at the end of the last page
-  of the questions list in the "List" tab.  
+  of the questions list in the "List" tab.
   '''
+    @app.route('/questions', methods=['POST'])
+    def create_question():
+        data = request.get_json()
+        try:
+            question = Question(
+                data['question'], data['answer'], data['category'], data['difficulty'])
+            question.insert()
+            return jsonify({}), 201
+        except:
+            abort(422)
 
     '''
   @TODO: 
@@ -144,5 +146,16 @@ def create_app(test_config=None):
   Create error handlers for all expected errors 
   including 404 and 422. 
   '''
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            'success': False,
+            'error': 404,
+            'message': 'Not Found'
+        }), 404
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return error
 
     return app

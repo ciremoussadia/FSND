@@ -67,6 +67,26 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 404)
 
-    # Make the tests conveniently executable
+    def test_create_question(self):
+        res = self.client().post('/questions', json={
+            'question': 'FooBar?',
+            'answer': 'Foobar answer.',
+            'category': 2,
+            'difficulty': 3
+        })
+
+        self.assertEqual(res.status_code, 201)
+
+    def test_unsuccesfull_create_question(self):
+        data = {
+            'question': 'FooBar?',
+            'answer': 'Foobar answer.',
+            'difficulty': '3'
+        }
+        res = self.client().post('/questions', json=data)
+
+        self.assertEqual(res.status_code, 422)
+
+        # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
