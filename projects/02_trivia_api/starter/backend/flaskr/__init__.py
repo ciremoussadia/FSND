@@ -153,6 +153,22 @@ def create_app(test_config=None):
   and shown whether they were correct or not.
   '''
 
+    @app.route('/quizzes', methods=['POST'])
+    def get_quizz():
+        params = request.get_json()
+
+        query = Question.query
+        if params['quiz_category']['id'] != 0:
+            Category.query.get_or_404(params['quiz_category']['id'])
+            query = Question.query.filter_by(
+                category=params['quiz_category']['id'])
+
+        if params['previous_questions']:
+            ids = [q['id'] for q in params['previous_questions']]
+            query.filter(~Question.id.in_(ids))
+
+        question = random.choice(query.all())
+        return jsonify(question.format()), 200
     '''
   @TODO:
   Create error handlers for all expected errors

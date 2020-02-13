@@ -1,6 +1,7 @@
 import os
 import unittest
 import json
+import random
 from flask_sqlalchemy import SQLAlchemy
 
 from flaskr import create_app
@@ -109,6 +110,47 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertTrue(term in data[0]['question'])
+
+    def test_quizzes(self):
+        payload = {
+            'previous_questions': [],
+            'quiz_category': {'type': 'All', 'id': 0}
+        }
+        res = self.client().post('/quizzes', json=payload)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertIsNotNone(data['question'])
+
+    def test_quizzes_category(self):
+        payload = {
+            'previous_questions': [],
+            'quiz_category': {'type': 'Science', 'id': 1}
+        }
+        res = self.client().post('/quizzes', json=payload)
+        data = json.loads(res.data)
+
+        self.assertEqual(data['category'], 1)
+
+    def test_quizzes_bad_category(self):
+        payload = {
+            'previous_questions': [],
+            'quiz_category': {'type': 'Science', 'id': 404}
+        }
+        res = self.client().post('/quizzes', json=payload)
+
+        self.assertEqual(res.status_code, 404)
+
+    def test_quizzes_not_in_previous_questions(self):
+        ques = random.choices(Question.query.all(), k=2)
+        payload = {
+            'previous_questions': [question.format() for question in ques],
+            'quiz_category': {'type': 'Science', 'id': 0}
+        }
+
+        res = self.client().post('/quizzes', json=payload)
+        data = json.loads(res.data)
+
+        self.assertTrue(data not in ques)
 
         # Make the tests conveniently executable
 if __name__ == "__main__":
