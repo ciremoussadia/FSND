@@ -101,13 +101,19 @@ def create_app(test_config=None):
     @app.route('/questions', methods=['POST'])
     def create_question():
         data = request.get_json()
-        try:
-            question = Question(
-                data['question'], data['answer'], data['category'], data['difficulty'])
-            question.insert()
-            return jsonify({}), 201
-        except:
-            abort(422)
+        if 'searchTerm' in data:
+            term = data['searchTerm']
+            questions = Question.query.filter(
+                Question.question.ilike('%{}%'.format(term)))
+            return jsonify([question.format() for question in questions]), 200
+        else:
+            try:
+                question = Question(
+                    data['question'], data['answer'], data['category'], data['difficulty'])
+                question.insert()
+                return jsonify({}), 201
+            except:
+                abort(422)
 
     '''
   @TODO:
@@ -136,21 +142,21 @@ def create_app(test_config=None):
         return jsonify([question.format() for question in questions]), 200
 
     '''
-  @TODO: 
-  Create a POST endpoint to get questions to play the quiz. 
-  This endpoint should take category and previous question parameters 
-  and return a random questions within the given category, 
-  if provided, and that is not one of the previous questions. 
+  @TODO:
+  Create a POST endpoint to get questions to play the quiz.
+  This endpoint should take category and previous question parameters
+  and return a random questions within the given category,
+  if provided, and that is not one of the previous questions.
 
   TEST: In the "Play" tab, after a user selects "All" or a category,
   one question at a time is displayed, the user is allowed to answer
-  and shown whether they were correct or not. 
+  and shown whether they were correct or not.
   '''
 
     '''
-  @TODO: 
-  Create error handlers for all expected errors 
-  including 404 and 422. 
+  @TODO:
+  Create error handlers for all expected errors
+  including 404 and 422.
   '''
     @app.errorhandler(404)
     def not_found(error):
