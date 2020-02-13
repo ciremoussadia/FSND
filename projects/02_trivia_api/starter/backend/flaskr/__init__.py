@@ -136,10 +136,18 @@ def create_app(test_config=None):
   '''
     @app.route('/categories/<int:category_id>/questions')
     def categories_questions(category_id):
+        page = request.args.get('page', 1, int)
+        offset = (page - 1) * 10
+        categories = Category.query.all()
         Category.query.get_or_404(category_id)
-        questions = Question.query.filter_by(category=category_id)
+        questions = Question.query.filter_by(category=category_id).offset(
+            offset).limit(QUESTIONS_PER_PAGE)
 
-        return jsonify([question.format() for question in questions]), 200
+        return jsonify({
+            'questions': [question.format() for question in questions],
+            'total_questions': len(questions.all()),
+            'categories': formatted_categories(categories)
+        }), 200
 
     '''
   @TODO:
