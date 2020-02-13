@@ -110,24 +110,30 @@ def create_app(test_config=None):
             abort(422)
 
     '''
-  @TODO: 
-  Create a POST endpoint to get questions based on a search term. 
-  It should return any questions for whom the search term 
-  is a substring of the question. 
+  @TODO:
+  Create a POST endpoint to get questions based on a search term.
+  It should return any questions for whom the search term
+  is a substring of the question.
 
-  TEST: Search by any phrase. The questions list will update to include 
-  only question that include that string within their question. 
-  Try using the word "title" to start. 
+  TEST: Search by any phrase. The questions list will update to include
+  only question that include that string within their question.
+  Try using the word "title" to start.
   '''
 
     '''
-  @TODO: 
-  Create a GET endpoint to get questions based on category. 
+  @TODO:
+  Create a GET endpoint to get questions based on category.
 
-  TEST: In the "List" tab / main screen, clicking on one of the 
-  categories in the left column will cause only questions of that 
-  category to be shown. 
+  TEST: In the "List" tab / main screen, clicking on one of the
+  categories in the left column will cause only questions of that
+  category to be shown.
   '''
+    @app.route('/categories/<int:category_id>/questions')
+    def categories_questions(category_id):
+        Category.query.get_or_404(category_id)
+        questions = Question.query.filter_by(category=category_id)
+
+        return jsonify([question.format() for question in questions]), 200
 
     '''
   @TODO: 

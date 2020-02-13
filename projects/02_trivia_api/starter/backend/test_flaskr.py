@@ -87,6 +87,21 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 422)
 
+    def test_a_category_questions(self):
+        id = 1
+        res = self.client().get('/categories/{}/questions'.format(1))
+        res_data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(set([data['category']
+                              for data in res_data]), {id})
+
+    def test_unexisting_category_questions(self):
+        id = 404
+        res = self.client().get('/categories/{}/questions'.format(id))
+
+        self.assertEqual(res.status_code, 404)
+
         # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
