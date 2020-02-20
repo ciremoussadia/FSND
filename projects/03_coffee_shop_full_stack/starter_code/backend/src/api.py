@@ -79,6 +79,12 @@ def create_drink():
 '''
 
 
+@app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+@requires_auth()
+def update_drink(drink_id):
+    pass
+
+
 '''
 @TODO implement endpoint
     DELETE /drinks/<id>
