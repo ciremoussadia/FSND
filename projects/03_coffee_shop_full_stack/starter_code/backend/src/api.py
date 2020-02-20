@@ -95,6 +95,10 @@ def update_drink(drink_id):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<int:drink_id>', methods=['DELETE'])
+@requires_auth()
+def delete_drink(drink_id):
+    pass
 
 
 # Error Handling
