@@ -64,7 +64,7 @@ def get_token_auth_header():
 
 def check_permissions(permission, payload):
     if 'permissions' not in payload:
-        raise AuthError('Bad permissions', 401)
+        raise AuthError('No permissions found', 401)
 
     if permission not in payload['permissions']:
         raise AuthError('Bad permissions', 401)
@@ -117,10 +117,10 @@ def verify_decode_jwt(token):
             return payload
 
         except jwt.ExpiredSignatureError:
-            raise AuthError('Bad Authorization', 401)
+            raise AuthError('Expired Signature', 401)
 
         except jwt.JWTClaimsError:
-            raise AuthError('Bad Authorization', 401)
+            raise AuthError('JWT error', 401)
         except Exception:
             raise AuthError('Bad Request', 400)
     raise AuthError('Bad Request', 400)

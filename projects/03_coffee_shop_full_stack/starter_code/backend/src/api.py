@@ -50,7 +50,7 @@ def get_drinks():
 def get_drinks_detail(token):
     drinks = Drink.query.all()
     data = [drink.long() for drink in drinks]
-    return jsonify(data), 200
+    return jsonify({'drinks': data}), 200
 
 
 '''
@@ -63,9 +63,17 @@ def get_drinks_detail(token):
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks', methods=['POST'])
-@requires_auth()
-def create_drink():
-    pass
+@requires_auth('post:drinks')
+def create_drink(token):
+    params = request.get_json()
+    drink = Drink(title=params['title'], recipe=json.dumps(params['recipe']))
+    try:
+        drink.insert()
+    except Exception as e:
+        print(e)
+        abort(401)
+
+    return jsonify({"success": True, "drinks": drink.long()}), 200
 
 
 '''
@@ -82,9 +90,22 @@ def create_drink():
 
 
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
-@requires_auth()
-def update_drink(drink_id):
-    pass
+@requires_auth('patch:drinks')
+def update_drink(token, drink_id):
+    params_data = request.get_json()
+    drink = Drink.query.get_or_404(drink_id)
+    try:
+        if params_data['title']:
+            drink.title = params_data['title']
+
+        if params_data['recipe']:
+            drink.recipe = json.dumps(params_data['recipe'])
+
+        drink.update()
+    except Exception as e:
+        print(e)
+
+    return jsonify({"success": True, "drinks": [drink.long()]}), 200
 
 
 '''
@@ -98,9 +119,15 @@ def update_drink(drink_id):
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
-@requires_auth()
-def delete_drink(drink_id):
-    pass
+@requires_auth('delete:drinks')
+def delete_drink(token, drink_id):
+    try:
+        drink = Drink.query.get(drink_id)
+        drink.delete()
+    except:
+        abort(404)
+
+    return jsonify({"success": True, "delete": drink_id}), 200
 
 
 # Error Handling
