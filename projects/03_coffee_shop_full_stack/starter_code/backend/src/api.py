@@ -47,8 +47,10 @@ def get_drinks():
 
 @app.route('/drinks-detail')
 @requires_auth('get:drinks-detail')
-def get_drinks_detail():
-    pass
+def get_drinks_detail(token):
+    drinks = Drink.query.all()
+    data = [drink.long() for drink in drinks]
+    return jsonify(data), 200
 
 
 '''
